@@ -6,8 +6,14 @@ use rand::random;
 async fn main() {
     println!("start program");
     let vs = (0..10).collect::<Vec<i32>>();
+    let mut hs = vec![];
     for v in vs {
-        af(v).await;
+        let h = tokio::spawn(af(v));
+        hs.push(h)
+    }
+
+    for h in hs {
+        h.await.unwrap();
     }
     println!("finish program");
 }
