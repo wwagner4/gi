@@ -1,18 +1,20 @@
-use tokio::time::*;
+use tokio::time::{Duration, sleep};
+use rand::random;
 
 
 #[tokio::main]
 async fn main() {
     println!("start program");
-    af(23).await;
-    af(24).await;
-    af(25).await;
-    af(26).await;
+    let vs = (0..10).collect::<Vec<i32>>();
+    for v in vs {
+        af(v).await;
+    }
     println!("finish program");
 }
 
-async fn af(num: u32) {
-    let d = Duration::from_millis(1000);
-    sleep(d);
-    println!("executing async function {num} slept {d:?}ms");
+async fn af(num: i32) {
+    let d1 = random::<u64>() % 900 + 100;
+    let d = Duration::from_millis(d1);
+    sleep(d).await;
+    println!("executing async function {num} slept {d:?}");
 } 
