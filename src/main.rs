@@ -8,6 +8,7 @@ async fn main() {
     println!("start program");
     afs_borrowed().await;
     afs_not_borrowed().await;
+    afs_borrowed_zipped().await;
     println!("finish program");
 }
 
@@ -51,6 +52,36 @@ async fn afs_borrowed() {
                     let x = str_arc2.as_str();
                     my_async_function(v, x).await 
                 }.await
+            }
+        });
+        hs.push(h);
+    }
+
+    for h in hs {
+        h.await.unwrap();
+    }
+}
+
+
+/*
+Looks smart but has the costs one copy of all data for each thread.
+Evtl. someone could argue, creating the copies never takes place ???
+ */
+async fn afs_borrowed_zipped() {
+    let str1 = "borrowed string (zipped)".to_string();
+    let nums = (0..10).collect::<Vec<i32>>();
+    let strs = vec![str1; nums.len()];
+    let vs = nums
+        .iter()
+        .zip(strs)
+        .map(|(a, b)| (*a, b))
+        .collect::<Vec<_>>();
+
+    let mut hs = vec!();
+    for (num, str2) in vs {
+        let h = tokio::spawn({
+            async move {
+                my_async_function(num, &str2).await;
             }
         });
         hs.push(h);
