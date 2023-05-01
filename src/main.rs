@@ -8,13 +8,13 @@ struct ForcedTestErr;
 
 struct MyData {
     id: u8,
-    name: String,
+    info: String,
     lang: Vec<String>,
 }
 
 impl MyData {
     fn create(id: u8, name: &str, lang: &Vec<String>) -> Self {
-        MyData { id: id, name: name.to_string(), lang: lang.clone() }
+        MyData { id: id, info: name.to_string(), lang: lang.clone() }
     }
 }
 
@@ -26,14 +26,12 @@ async fn main() {
 }
 
 fn create_datas() -> Vec<MyData> {
+    let ids = 0..30;
     let lang = vec!("DE".to_string(), "FR".to_string(), "ES".to_string());
-    vec!(
-        MyData::create(0, "erwin", &lang),
-        MyData::create(1, "fromm", &lang),
-        MyData::create(2, "leben", &lang),
-        MyData::create(3, "liebe", &lang),
-        MyData::create(4, "lebendig", &lang),
-    )
+    let info = "Some Info";
+    ids.into_iter()
+        .map(|i|MyData::create(i, info, &lang))
+        .collect::<Vec<_>>()
 }
 
 async fn with_stream() {
@@ -45,7 +43,7 @@ async fn with_stream() {
         .collect::<Vec<Result<_, _>>>();
     let result_all = stream::iter(result_nums)
         .try_for_each_concurrent(
-            Some(3),
+            Some(10),
             |value| my_async_function(&value),
         ).await;
     match result_all {
@@ -56,9 +54,9 @@ async fn with_stream() {
 }
 
 async fn my_async_function(data: &MyData) -> Result<(), ForcedTestErr> {
-    println!("---> async function result {} {} {:?}", data.id, data.name, data.lang);
-    let ran_num = random::<u64>() % 1000;
-    if ran_num < 100 {
+    println!("---> async function result {} {} {:?}", data.id, data.info, data.lang);
+    let ran_num = random::<u64>() % 5000;
+    if ran_num < 500 {
         return Err(ForcedTestErr);
     }
     let dur = Duration::from_millis(ran_num + 10);
