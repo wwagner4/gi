@@ -46,7 +46,7 @@ async fn with_stream() {
     let result_all = stream::iter(result_nums)
         .try_for_each_concurrent(
             Some(3),
-            |value| async move { my_async_function(&value).await },
+            |value| my_async_function(&value),
         ).await;
     match result_all {
         Ok(_) => println!("# concurrent execution of {} data was successful", datas.len()),
