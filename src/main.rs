@@ -31,3 +31,11 @@ async fn my_async_function(num: i32) -> () {
     println!("<--- async function {num} slept {d:?}");
 }
 
+async fn my_async_function1(num: i32) -> anyhow::Result<()>{
+    println!("---> async function result {}", num);
+    let d1 = random::<u64>() % 1000 + 10;
+    let d = Duration::from_millis(d1);
+    sleep(d).await;
+    println!("<--- async function result {}slept {:?}", num, d);
+    Ok(())
+}
