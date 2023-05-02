@@ -26,7 +26,7 @@ async fn main() {
 }
 
 fn create_datas() -> Vec<MyData> {
-    let ids = 0..30;
+    let ids = 0..10;
     let lang = vec!("DE".to_string(), "FR".to_string(), "ES".to_string());
     let info = "Some Info";
     ids.into_iter()
@@ -43,7 +43,7 @@ async fn with_stream() {
         .collect::<Vec<Result<_, _>>>();
     let result_all = stream::iter(result_nums)
         .try_for_each_concurrent(
-            Some(10),
+            None,
             |value| my_async_function(&value),
         ).await;
     match result_all {
@@ -56,7 +56,7 @@ async fn with_stream() {
 async fn my_async_function(data: &MyData) -> Result<(), ForcedTestErr> {
     println!("---> async function result {} {} {:?}", data.id, data.info, data.lang);
     let ran_num = random::<u64>() % 5000;
-    if ran_num < 500 {
+    if ran_num < 100 {
         return Err(ForcedTestErr);
     }
     let dur = Duration::from_millis(ran_num + 10);
