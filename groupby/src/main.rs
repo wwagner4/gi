@@ -28,9 +28,12 @@ fn main() {
 
     println!("- filter -----------------------------------");
     let ids = vec![1, 2, 3, 4];
-    ids.into_iter()
+    let grps = ids.into_iter()
         .map(|id| filter(id, &data))
-        .for_each(|x| println!("grp: {:?}", x));
+        .collect::<Vec<_>>();
+    for grp in grps {
+        println!("grp: {:?}", grp)
+    }
 }
 
 fn filter(id: i32, datas: &Vec<Data>) -> (i32, Vec<&Data>) {
