@@ -6,6 +6,18 @@ struct Data {
     username: String,
 }
 
+#[derive(Debug, Clone)]
+struct DataGroup<'a> {
+    id: i32,
+    datas: Vec<&'a Data>,
+}
+
+#[derive(Debug, Clone)]
+struct DataGroup1 {
+    id: i32,
+    datas: Vec<Data>,
+}
+
 fn main() {
     let data = vec![
         Data { id: 1, username: "A".to_string() },
@@ -26,7 +38,23 @@ fn main() {
         println!("grp: {:?}", grp);
     }
 
-    println!("- filter -----------------------------------");
+    println!("- filter owned -----------------------------------");
+    let ids = vec![1, 2, 3, 4];
+    let grps = ids.into_iter()
+        .map(|id| {
+            let grp = data
+                .iter()
+                .filter(|d| d.id == id)
+                .map(|x| x.to_owned())
+                .collect::<Vec<_>>();
+            DataGroup1 { id: id, datas: grp }
+        })
+        .collect::<Vec<_>>();
+    for grp in grps {
+        println!("grp: {:?}", grp)
+    }
+
+    println!("- filter ref -----------------------------------");
     let ids = vec![1, 2, 3, 4];
     let grps = ids.into_iter()
         .map(|id| {
@@ -34,7 +62,7 @@ fn main() {
                 .iter()
                 .filter(|d| d.id == id)
                 .collect::<Vec<_>>();
-            (id, grp)
+            DataGroup { id: id, datas: grp }
         })
         .collect::<Vec<_>>();
     for grp in grps {
