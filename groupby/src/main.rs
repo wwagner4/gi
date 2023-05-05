@@ -7,13 +7,13 @@ struct MasterData {
 }
 
 #[derive(Debug, Clone)]
-struct CombiData1 {
+struct CombiData {
     master: MasterData,
     datas: Vec<Data>,
 }
 
 #[derive(Debug, Clone)]
-struct CombiData<'a> {
+struct CombiDataRef<'a> {
     master: &'a MasterData,
     datas: Vec<&'a Data>,
 }
@@ -22,18 +22,6 @@ struct CombiData<'a> {
 struct Data {
     id: i32,
     username: String,
-}
-
-#[derive(Debug, Clone)]
-struct DataGroup<'a> {
-    id: i32,
-    datas: Vec<&'a Data>,
-}
-
-#[derive(Debug, Clone)]
-struct DataGroup1 {
-    id: i32,
-    datas: Vec<Data>,
 }
 
 fn main() {
@@ -51,31 +39,31 @@ fn main() {
         Data { id: 2, username: "E".to_string() },
     ];
 
-    println!("- filter owned -----------------------------------");
+    println!("- filter ref -----------------------------------");
     let data_groups = master_datas
-        .into_iter()
+        .iter()
         .map(|md| {
             let datas = datas
                 .iter()
                 .filter(|d| d.id == md.id)
-                .map(|d| d.to_owned())
                 .collect::<Vec<_>>();
-            CombiData1 { master: md, datas: datas }
+            CombiDataRef { master: &md, datas }
         })
         .collect::<Vec<_>>();
     for grp in data_groups {
         println!("grp: {:?}", grp)
     }
 
-    println!("- filter ref -----------------------------------");
-    let ids = vec![1, 2, 3, 4];
-    let data_groups = ids.into_iter()
-        .map(|id| {
+    println!("- filter owned -----------------------------------");
+    let data_groups = master_datas
+        .into_iter()
+        .map(|master| {
             let datas = datas
                 .iter()
-                .filter(|d| d.id == id)
+                .filter(|d| d.id == master.id)
+                .map(|d| d.to_owned())
                 .collect::<Vec<_>>();
-            DataGroup { id, datas }
+            CombiData { master, datas }
         })
         .collect::<Vec<_>>();
     for grp in data_groups {
@@ -83,13 +71,13 @@ fn main() {
     }
 
     println!("- group_by -----------------------------------");
-    let grps: Vec<_> = datas
+    let groups: Vec<_> = datas
         .iter()
         .group_by(|x| x.id)
         .into_iter()
         .map(|(a, b)| (a, b.collect::<Vec<_>>()))
         .collect::<Vec<_>>();
-    for grp in grps {
+    for grp in groups {
         println!("grp: {:?}", grp);
     }
 }
