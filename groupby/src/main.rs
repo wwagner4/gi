@@ -29,17 +29,15 @@ fn main() {
     println!("- filter -----------------------------------");
     let ids = vec![1, 2, 3, 4];
     let grps = ids.into_iter()
-        .map(|id| filter(id, &data))
+        .map(|id| {
+            let grp = data
+                .iter()
+                .filter(|d| d.id == id)
+                .collect::<Vec<_>>();
+            (id, grp)
+        })
         .collect::<Vec<_>>();
     for grp in grps {
         println!("grp: {:?}", grp)
     }
-}
-
-fn filter(id: i32, datas: &Vec<Data>) -> (i32, Vec<&Data>) {
-    let grp = datas
-        .iter()
-        .filter(|d| d.id == id)
-        .collect::<Vec<_>>();
-    (id, grp)
 }
